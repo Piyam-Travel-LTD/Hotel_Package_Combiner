@@ -35,13 +35,19 @@ h1 {
 
 /* --- Input Fields & Buttons --- */
 input[type="text"],
-input[type="number"] {
+input[type="number"],
+textarea {
     width: 100%;
     padding: 10px;
     margin-bottom: 10px;
     border: 1px solid #ccc;
     border-radius: 4px;
     box-sizing: border-box; /* Important for 100% width */
+    font-family: inherit; /* Make textarea use the same font */
+}
+textarea {
+    min-height: 100px;
+    resize: vertical;
 }
 label {
     display: block;
@@ -78,11 +84,26 @@ button:hover {
     background-color: #c82333;
 }
 
-/* --- Section 1: Guest Occupancy --- */
+/* --- Section 1: Guest Occupancy & Itinerary --- */
 .guest-inputs {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
     gap: 20px;
+    margin-bottom: 20px;
+}
+.itinerary-order h3 {
+    font-size: 1.1em;
+    margin-bottom: 10px;
+}
+.radio-group {
+    display: inline-block;
+    margin-right: 20px;
+}
+.radio-group label {
+    display: inline-block;
+    font-weight: normal;
+    margin-left: 5px;
+    cursor: pointer;
 }
 
 /* --- Section 2: Hotel Options (Two Columns) --- */
@@ -147,9 +168,15 @@ button:hover {
     padding-bottom: 10px;
     border-bottom: 1px solid #eee;
 }
+.package-result p {
+    /* This is the key change: preserves line breaks from the textarea */
+    white-space: pre-line;
+    margin-top: 0;
+}
 .package-price {
     font-size: 1.1em;
     font-weight: 600;
+    margin-top: 15px;
 }
 .package-price .total {
     color: #005a9c;
