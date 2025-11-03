@@ -15,15 +15,24 @@ const addHotelBox = (targetList) => {
     const box = document.createElement('div');
     box.className = 'hotel-box';
     
+    // *** CHANGED to use <textarea> and new labels/placeholders ***
     box.innerHTML = `
         <button class="btn-remove" title="Remove hotel">&times;</button>
         <div>
-            <label for="hotel_name_${hotelBoxCounter}">Hotel Name</label>
-            <input type="text" id="hotel_name_${hotelBoxCounter}" class="hotel-name" placeholder="e.g. Makkah Hotel A">
+            <label for="hotel_summary_${hotelBoxCounter}">Hotel Summary</label>
+            <textarea 
+                id="hotel_summary_${hotelBoxCounter}" 
+                class="hotel-summary" 
+                placeholder="e.g. Makkah Hotel A - 5 Nights\nQuad Room, Half Board\nNear Haram Gate 79"></textarea>
         </div>
         <div>
             <label for="hotel_price_${hotelBoxCounter}">Total Room Price (£)</label>
-            <input type="number" id="hotel_price_${hotelBoxCounter}" class="hotel-price" placeholder="e.g. 400" min="0">
+            <input 
+                type="number" 
+                id="hotel_price_${hotelBoxCounter}" 
+                class="hotel-price" 
+                placeholder="e.g. 400" 
+                min="0">
         </div>
     `;
     targetList.appendChild(box);
@@ -42,12 +51,13 @@ const readHotelData = (list) => {
     const boxes = list.querySelectorAll('.hotel-box');
     
     boxes.forEach(box => {
-        const name = box.querySelector('.hotel-name').value.trim();
+        // *** CHANGED to read from ".hotel-summary" (the textarea) ***
+        const summary = box.querySelector('.hotel-summary').value.trim();
         const price = parseFloat(box.querySelector('.hotel-price').value);
 
-        // Only add if both name and price are valid
-        if (name && !isNaN(price) && price >= 0) {
-            hotels.push({ name, price });
+        // Only add if both summary and price are valid
+        if (summary && !isNaN(price) && price >= 0) {
+            hotels.push({ summary, price }); // Store as 'summary'
         }
     });
     return hotels;
@@ -71,9 +81,12 @@ const generatePackages = () => {
     const madinahHotels = readHotelData(madinahList);
 
     if (makkahHotels.length === 0 || madinahHotels.length === 0) {
-        outputContainer.innerHTML = `<p style="color: red; font-weight: bold;">Error: Please add at least one valid hotel (with name and price) to both Makkah and Madinah lists.</p>`;
+        outputContainer.innerHTML = `<p style="color: red; font-weight: bold;">Error: Please add at least one valid hotel (with summary and price) to both Makkah and Madinah lists.</p>`;
         return;
     }
+
+    // *** NEW: Get Itinerary Order ***
+    const itineraryOrder = document.querySelector('input[name="itinerary_order"]:checked').value;
 
     // 3. Mix & Match (Cartesian Product)
     const allCombinations = [];
@@ -90,8 +103,8 @@ const generatePackages = () => {
         const perPersonPrice = totalPrice / totalPayingGuests;
 
         return {
-            makkahName: makkah.name,
-            madinahName: madinah.name,
+            makkahSummary: makkah.summary,
+            madinahSummary: madinah.summary,
             totalPrice: totalPrice,
             perPersonPrice: perPersonPrice
         };
@@ -109,12 +122,25 @@ const generatePackages = () => {
     }
 
     finalPackages.forEach((pkg, index) => {
+        
+        // *** NEW: Dynamically set city order for output ***
+        const city1Label = (itineraryOrder === 'makkah') ? 'Makkah' : 'Madinah';
+        const city1Summary = (itineraryOrder === 'makkah') ? pkg.makkahSummary : pkg.madinahSummary;
+        
+        const city2Label = (itineraryOrder === 'makkah') ? 'Madinah' : 'Makkah';
+        const city2Summary = (itineraryOrder === 'makkah') ? pkg.madinahSummary : pkg.makkahSummary;
+
+        // *** UPDATED: The output HTML string ***
         const packageHTML = `
             <div class="package-result">
                 <h3>Package ${index + 1}</h3>
                 <p>
-                    <strong>Makkah:</strong> ${pkg.makkahName}<br>
-                    <strong>Madinah:</strong> ${pkg.madinahName}
+                    <strong>City 1 (${city1Label}):</strong>
+                    ${city1Summary}
+                </p>
+                <p>
+                    <strong>City 2 (${city2Label}):</strong>
+                    ${city2Summary}
                 </p>
                 <div class="package-price">
                     <span>Per Person Price: £${pkg.perPersonPrice.toFixed(2)}</span>
