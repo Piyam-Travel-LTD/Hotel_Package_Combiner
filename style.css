@@ -156,31 +156,38 @@ button:hover {
     padding-top: 20px;
 }
 .package-result {
-    background: #fefefe;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    padding: 20px;
-    margin-bottom: 15px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    /* Removed padding/border, as the <hr> will be the separator */
+    margin-bottom: 20px;
 }
+
+/* Make h3 (e.g. *Option 1*) the same size as normal text */
 .package-result h3 {
+    font-size: 1em; /* Makes it the same size as paragraph text */
+    font-weight: 600; /* Keeps it bold */
     margin-bottom: 15px;
-    padding-bottom: 10px;
-    border-bottom: 1px solid #eee;
+    padding-bottom: 0;
+    border-bottom: none;
 }
+
+/* Remove default margins on paragraphs */
 .package-result p {
-    /* This is the key change: preserves line breaks from the textarea */
     white-space: pre-line;
-    margin-top: 0;
+    margin: 0 0 15px 0; /* Remove top margin, add bottom margin */
 }
+
 .package-price {
-    /* font-size: 1.1em; */ /* Removed to keep text same size */
     font-weight: 600;
     margin-top: 15px;
 }
 .package-price .total {
     color: #005a9c;
-    /* font-size: 1.3em; */ /* Removed to keep text same size */
     display: block;
-    margin-top: 10px;
+    margin-top: 0; /* Removed space between price lines */
+}
+
+/* Style for the <hr> separator */
+.option-separator {
+    border: 0;
+    border-top: 2px dashed #ccc;
+    margin: 20px 0;
 }
