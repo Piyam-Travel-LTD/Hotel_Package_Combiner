@@ -174,13 +174,13 @@ button:hover {
     margin-top: 0;
 }
 .package-price {
-    font-size: 1.1em;
+    /* font-size: 1.1em; */ /* Removed to keep text same size */
     font-weight: 600;
     margin-top: 15px;
 }
 .package-price .total {
     color: #005a9c;
-    font-size: 1.3em;
+    /* font-size: 1.3em; */ /* Removed to keep text same size */
     display: block;
     margin-top: 10px;
 }
