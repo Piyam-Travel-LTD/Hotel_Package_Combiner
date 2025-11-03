@@ -124,36 +124,83 @@ const generatePackages = () => {
         const city2Label = (itineraryOrder === 'makkah') ? 'Madinah' : 'Makkah';
         const city2Summary = (itineraryOrder === 'makkah') ? pkg.madinahSummary : pkg.makkahSummary;
 
-        // *** THIS IS THE CHANGED SECTION ***
+        // *** NEW: Create the plain text for the copy button ***
+        // This includes the separator line at the end.
+        const copyText = `*Option ${index + 1}*
 
-        // Add a separator *before* this option, but NOT for the first one.
-        if (index > 0) {
-            outputContainer.innerHTML += '<hr class="option-separator">';
-        }
-        
-        // Build the HTML for the package
+*(${city1Label})*
+${city1Summary}
+
+*(${city2Label})*
+${city2Summary}
+
+*Per Person Price: £${pkg.perPersonPrice.toFixed(2)}*
+*Total Hotel Cost: £${pkg.totalPrice.toFixed(2)}*
+----------------------------`;
+
+        // *** NEW: Build the HTML for display ***
+        // We use separate <p> tags for heading and summary to control spacing.
+        // The `data-copy-text` attribute holds the clean text.
         const packageHTML = `
             <div class="package-result">
+                <button class="btn-copy" data-copy-text="${escape(copyText)}">Copy Option</button>
                 <h3>*Option ${index + 1}*</h3>
-                <p>
-                    <strong>*(${city1Label})*</strong><br>
-${city1Summary}
-                </p>
-                <p>
-                    <strong>*(${city2Label})*</strong><br>
-${city2Summary}
-                </p>
+                
+                <p><strong>*(${city1Label})*</strong></p>
+                <p class="summary-text">${city1Summary}</p>
+                
+                <p><strong>*(${city2Label})*</strong></p>
+                <p class="summary-text">${city2Summary}</p>
+                
                 <div class="package-price">
                     <span>*Per Person Price: £${pkg.perPersonPrice.toFixed(2)}*</span>
                     <span class="total">*Total Hotel Cost: £${pkg.totalPrice.toFixed(2)}*</span>
                 </div>
             </div>
         `;
-        // *** END OF CHANGED SECTION ***
-
+        
         outputContainer.innerHTML += packageHTML;
+        
+        // Add the text separator *between* options
+        if (index < finalPackages.length - 1) {
+             outputContainer.innerHTML += '<p class="text-separator">----------------------------</p>';
+        }
     });
 };
+
+// --- *** NEW: Function to handle all "Copy" clicks *** ---
+const handleCopyClick = async (e) => {
+    // Only act if the clicked element is a copy button
+    if (!e.target.classList.contains('btn-copy')) {
+        return;
+    }
+
+    const copyButton = e.target;
+    // Get the text from the 'data-copy-text' attribute
+    // We use 'unescape' to handle special characters
+    const textToCopy = unescape(copyButton.dataset.copyText);
+
+    try {
+        // Use the modern Clipboard API
+        await navigator.clipboard.writeText(textToCopy);
+        
+        // Visual feedback
+        const originalText = copyButton.textContent;
+        copyButton.textContent = 'Copied!';
+        copyButton.classList.add('copied');
+        
+        // Reset button text after 2 seconds
+        setTimeout(() => {
+            copyButton.textContent = originalText;
+            copyButton.classList.remove('copied');
+        }, 2000);
+
+    } catch (err) {
+        console.error('Failed to copy text: ', err);
+        alert('Failed to copy text. Please copy manually.');
+    }
+};
+
 
 // --- Event Listeners ---
 addMakkahBtn.addEventListener('click', () => addHotelBox(makkahList));
@@ -165,6 +212,9 @@ madinahList.addEventListener('click', handleListClick);
 
 // Main generate button
 generateBtn.addEventListener('click', generatePackages);
+
+// *** NEW: Add one listener to the container for all copy clicks ***
+outputContainer.addEventListener('click', handleCopyClick);
 
 // Add one of each box by default for usability
 addHotelBox(makkahList);
