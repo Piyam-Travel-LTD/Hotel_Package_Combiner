@@ -156,28 +156,50 @@ button:hover {
     padding-top: 20px;
 }
 .package-result {
-    /* Removed padding/border, as the <hr> will be the separator */
-    margin-bottom: 20px;
+    position: relative; /* Needed for positioning the copy button */
+    padding: 15px;
+    border: 1px solid #eee;
+    border-radius: 5px;
+    background: #fcfcfc;
+}
+/* Style for the *new* Copy Button */
+.btn-copy {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    padding: 5px 10px;
+    font-size: 0.9em;
+    background-color: #6c757d;
+}
+.btn-copy:hover {
+    background-color: #5a6268;
+}
+.btn-copy.copied {
+    background-color: #28a745;
 }
 
-/* Make h3 (e.g. *Option 1*) the same size as normal text */
+/* Make h3 (e.g. *Option 1*) the same size and remove space */
 .package-result h3 {
     font-size: 1em; /* Makes it the same size as paragraph text */
     font-weight: 600; /* Keeps it bold */
-    margin-bottom: 15px;
-    padding-bottom: 0;
-    border-bottom: none;
+    margin: 0;
+    margin-bottom: 15px; /* Space *after* Option 1 */
 }
 
 /* Remove default margins on paragraphs */
 .package-result p {
-    white-space: pre-line;
-    margin: 0 0 15px 0; /* Remove top margin, add bottom margin */
+    margin: 0;
+}
+
+/* Class for the summary text to add space *after* it */
+.summary-text {
+    white-space: pre-line; /* Preserves line breaks from textarea */
+    margin-bottom: 15px; /* Space *after* the summary */
 }
 
 .package-price {
     font-weight: 600;
-    margin-top: 15px;
+    margin-top: 0; /* Removed top space */
 }
 .package-price .total {
     color: #005a9c;
@@ -185,9 +207,9 @@ button:hover {
     margin-top: 0; /* Removed space between price lines */
 }
 
-/* Style for the <hr> separator */
-.option-separator {
-    border: 0;
-    border-top: 2px dashed #ccc;
+/* Style for the text separator */
+.text-separator {
+    text-align: center;
+    color: #aaa;
     margin: 20px 0;
 }
