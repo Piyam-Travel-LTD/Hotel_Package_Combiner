@@ -15,7 +15,6 @@ const addHotelBox = (targetList) => {
     const box = document.createElement('div');
     box.className = 'hotel-box';
     
-    // *** CHANGED to use <textarea> and new labels/placeholders ***
     box.innerHTML = `
         <button class="btn-remove" title="Remove hotel">&times;</button>
         <div>
@@ -51,13 +50,11 @@ const readHotelData = (list) => {
     const boxes = list.querySelectorAll('.hotel-box');
     
     boxes.forEach(box => {
-        // *** CHANGED to read from ".hotel-summary" (the textarea) ***
         const summary = box.querySelector('.hotel-summary').value.trim();
         const price = parseFloat(box.querySelector('.hotel-price').value);
 
-        // Only add if both summary and price are valid
         if (summary && !isNaN(price) && price >= 0) {
-            hotels.push({ summary, price }); // Store as 'summary'
+            hotels.push({ summary, price });
         }
     });
     return hotels;
@@ -70,7 +67,6 @@ const generatePackages = () => {
     const numChildren = parseInt(document.getElementById('children_paying').value, 10) || 0;
     const totalPayingGuests = numAdults + numChildren;
 
-    // Validation
     if (totalPayingGuests === 0) {
         outputContainer.innerHTML = `<p style="color: red; font-weight: bold;">Error: Please enter at least one Adult or Child (5-12) to calculate per-person pricing.</p>`;
         return;
@@ -85,7 +81,6 @@ const generatePackages = () => {
         return;
     }
 
-    // *** NEW: Get Itinerary Order ***
     const itineraryOrder = document.querySelector('input[name="itinerary_order"]:checked').value;
 
     // 3. Mix & Match (Cartesian Product)
@@ -114,7 +109,7 @@ const generatePackages = () => {
     finalPackages.sort((a, b) => a.totalPrice - b.totalPrice);
 
     // 6. Display the Results
-    outputContainer.innerHTML = ''; // Clear previous results
+    outputContainer.innerHTML = ''; 
 
     if (finalPackages.length === 0) {
         outputContainer.innerHTML = `<p>No valid packages could be generated. Check your inputs.</p>`;
@@ -123,31 +118,32 @@ const generatePackages = () => {
 
     finalPackages.forEach((pkg, index) => {
         
-        // *** NEW: Dynamically set city order for output ***
         const city1Label = (itineraryOrder === 'makkah') ? 'Makkah' : 'Madinah';
         const city1Summary = (itineraryOrder === 'makkah') ? pkg.makkahSummary : pkg.madinahSummary;
         
-        const city2Label = (itineraryOrder === 'makkah') ? 'Madinah' : 'Makkah';
+        const city2Label = (itineraryOrder === 'makkah') ? 'Madinah' : 'MK';
         const city2Summary = (itineraryOrder === 'makkah') ? pkg.madinahSummary : pkg.makkahSummary;
 
-        // *** UPDATED: The output HTML string ***
+        // *** THIS IS THE ONLY SECTION THAT CHANGED ***
         const packageHTML = `
             <div class="package-result">
-                <h3>Package ${index + 1}</h3>
+                <h3>Option ${index + 1}</h3>
                 <p>
-                    <strong>City 1 (${city1Label}):</strong>
+                    <strong>*(${city1Label})*</strong><br>
                     ${city1Summary}
                 </p>
                 <p>
-                    <strong>City 2 (${city2Label}):</strong>
+                    <strong>*(${city2Label})*</strong><br>
                     ${city2Summary}
                 </p>
                 <div class="package-price">
-                    <span>Per Person Price: £${pkg.perPersonPrice.toFixed(2)}</span>
-                    <span class="total">Total Hotel Cost: £${pkg.totalPrice.toFixed(2)}</span>
+                    <span>*Per Person Price: £${pkg.perPersonPrice.toFixed(2)}*</span>
+                    <span class="total">*Total Hotel Cost: £${pkg.totalPrice.toFixed(2)}*</span>
                 </div>
             </div>
         `;
+        // *** END OF CHANGED SECTION ***
+
         outputContainer.innerHTML += packageHTML;
     });
 };
