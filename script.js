@@ -121,20 +121,27 @@ const generatePackages = () => {
         const city1Label = (itineraryOrder === 'makkah') ? 'Makkah' : 'Madinah';
         const city1Summary = (itineraryOrder === 'makkah') ? pkg.makkahSummary : pkg.madinahSummary;
         
-        const city2Label = (itineraryOrder === 'makkah') ? 'Madinah' : 'Makkah'; // Corrected typo from 'MK'
+        const city2Label = (itineraryOrder === 'makkah') ? 'Madinah' : 'Makkah';
         const city2Summary = (itineraryOrder === 'makkah') ? pkg.madinahSummary : pkg.makkahSummary;
 
-        // *** THIS IS THE ONLY SECTION THAT CHANGED ***
+        // *** THIS IS THE CHANGED SECTION ***
+
+        // Add a separator *before* this option, but NOT for the first one.
+        if (index > 0) {
+            outputContainer.innerHTML += '<hr class="option-separator">';
+        }
+        
+        // Build the HTML for the package
         const packageHTML = `
             <div class="package-result">
                 <h3>*Option ${index + 1}*</h3>
                 <p>
                     <strong>*(${city1Label})*</strong><br>
-                    ${city1Summary}
+${city1Summary}
                 </p>
                 <p>
                     <strong>*(${city2Label})*</strong><br>
-                    ${city2Summary}
+${city2Summary}
                 </p>
                 <div class="package-price">
                     <span>*Per Person Price: £${pkg.perPersonPrice.toFixed(2)}*</span>
