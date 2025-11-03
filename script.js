@@ -121,13 +121,13 @@ const generatePackages = () => {
         const city1Label = (itineraryOrder === 'makkah') ? 'Makkah' : 'Madinah';
         const city1Summary = (itineraryOrder === 'makkah') ? pkg.makkahSummary : pkg.madinahSummary;
         
-        const city2Label = (itineraryOrder === 'makkah') ? 'Madinah' : 'MK';
+        const city2Label = (itineraryOrder === 'makkah') ? 'Madinah' : 'Makkah'; // Corrected typo from 'MK'
         const city2Summary = (itineraryOrder === 'makkah') ? pkg.madinahSummary : pkg.makkahSummary;
 
         // *** THIS IS THE ONLY SECTION THAT CHANGED ***
         const packageHTML = `
             <div class="package-result">
-                <h3>Option ${index + 1}</h3>
+                <h3>*Option ${index + 1}*</h3>
                 <p>
                     <strong>*(${city1Label})*</strong><br>
                     ${city1Summary}
