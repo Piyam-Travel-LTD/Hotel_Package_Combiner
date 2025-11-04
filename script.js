@@ -6,6 +6,8 @@ const addMakkahBtn = document.getElementById('add-makkah');
 const addMadinahBtn = document.getElementById('add-madinah');
 const generateBtn = document.getElementById('generate-packages');
 const outputContainer = document.getElementById('output-container');
+// *** NEW: Get the "Copy All" button ***
+const copyAllBtn = document.getElementById('copy-all-btn');
 
 let hotelBoxCounter = 0;
 
@@ -67,8 +69,14 @@ const generatePackages = () => {
     const numChildren = parseInt(document.getElementById('children_paying').value, 10) || 0;
     const totalPayingGuests = numAdults + numChildren;
 
+    // --- Validation and Error States ---
+    const showError = (message) => {
+        outputContainer.innerHTML = `<p style="color: red; font-weight: bold;">${message}</p>`;
+        copyAllBtn.style.display = 'none'; // Hide copy button on error
+    };
+
     if (totalPayingGuests === 0) {
-        outputContainer.innerHTML = `<p style="color: red; font-weight: bold;">Error: Please enter at least one Adult or Child (5-12) to calculate per-person pricing.</p>`;
+        showError("Error: Please enter at least one Adult or Child (5-12) to calculate per-person pricing.");
         return;
     }
 
@@ -77,7 +85,7 @@ const generatePackages = () => {
     const madinahHotels = readHotelData(madinahList);
 
     if (makkahHotels.length === 0 || madinahHotels.length === 0) {
-        outputContainer.innerHTML = `<p style="color: red; font-weight: bold;">Error: Please add at least one valid hotel (with summary and price) to both Makkah and Madinah lists.</p>`;
+        showError("Error: Please add at least one valid hotel (with summary and price) to both Makkah and Madinah lists.");
         return;
     }
 
@@ -110,9 +118,10 @@ const generatePackages = () => {
 
     // 6. Display the Results
     outputContainer.innerHTML = ''; 
+    let allOptionsCopyText = ""; // *** NEW: Master string for all copy text ***
 
     if (finalPackages.length === 0) {
-        outputContainer.innerHTML = `<p>No valid packages could be generated. Check your inputs.</p>`;
+        showError("No valid packages could be generated. Check your inputs.");
         return;
     }
 
@@ -124,8 +133,7 @@ const generatePackages = () => {
         const city2Label = (itineraryOrder === 'makkah') ? 'Madinah' : 'Makkah';
         const city2Summary = (itineraryOrder === 'makkah') ? pkg.madinahSummary : pkg.makkahSummary;
 
-        // *** NEW: Create the plain text for the copy button ***
-        // This includes the separator line at the end.
+        // *** NEW: Build the plain text for this option ***
         const copyText = `*Option ${index + 1}*
 
 *(${city1Label})*
@@ -135,17 +143,12 @@ ${city1Summary}
 ${city2Summary}
 
 *Per Person Price: £${pkg.perPersonPrice.toFixed(2)}*
-*Total Hotel Cost: £${pkg.totalPrice.toFixed(2)}*
-----------------------------`;
+*Total Hotel Cost: £${pkg.totalPrice.toFixed(2)}*`;
 
-        // *** NEW: Build the HTML for display ***
-        // We use separate <p> tags for heading and summary to control spacing.
-        // The `data-copy-text` attribute holds the clean text.
+        // *** MODIFIED: HTML no longer contains a copy button ***
         const packageHTML = `
             <div class="package-result">
-                <button class="btn-copy" data-copy-text="${escape(copyText)}">Copy Option</button>
                 <h3>*Option ${index + 1}*</h3>
-                
                 <p><strong>*(${city1Label})*</strong></p>
                 <p class="summary-text">${city1Summary}</p>
                 
@@ -161,38 +164,37 @@ ${city2Summary}
         
         outputContainer.innerHTML += packageHTML;
         
-        // Add the text separator *between* options
+        // *** NEW: Add this option's text to the master string ***
+        allOptionsCopyText += copyText;
+
+        // Add separators (HTML and plain text)
         if (index < finalPackages.length - 1) {
              outputContainer.innerHTML += '<p class="text-separator">----------------------------</p>';
+             allOptionsCopyText += '\n----------------------------\n\n'; // Add separator to master text
         }
     });
+
+    // 7. Attach master string to the "Copy All" button and show it
+    copyAllBtn.dataset.copyText = allOptionsCopyText;
+    copyAllBtn.style.display = 'inline-block'; // Show the button
 };
 
-// --- *** NEW: Function to handle all "Copy" clicks *** ---
-const handleCopyClick = async (e) => {
-    // Only act if the clicked element is a copy button
-    if (!e.target.classList.contains('btn-copy')) {
-        return;
-    }
+// --- *** MODIFIED: Function to handle the "Copy All" click *** ---
+const handleCopyClick = async () => {
+    const textToCopy = copyAllBtn.dataset.copyText;
 
-    const copyButton = e.target;
-    // Get the text from the 'data-copy-text' attribute
-    // We use 'unescape' to handle special characters
-    const textToCopy = unescape(copyButton.dataset.copyText);
+    if (!textToCopy) return; // No text to copy
 
     try {
-        // Use the modern Clipboard API
         await navigator.clipboard.writeText(textToCopy);
         
-        // Visual feedback
-        const originalText = copyButton.textContent;
-        copyButton.textContent = 'Copied!';
-        copyButton.classList.add('copied');
+        const originalText = copyAllBtn.textContent;
+        copyAllBtn.textContent = 'Copied!';
+        copyAllBtn.classList.add('copied');
         
-        // Reset button text after 2 seconds
         setTimeout(() => {
-            copyButton.textContent = originalText;
-            copyButton.classList.remove('copied');
+            copyAllBtn.textContent = originalText;
+            copyAllBtn.classList.remove('copied');
         }, 2000);
 
     } catch (err) {
@@ -213,8 +215,8 @@ madinahList.addEventListener('click', handleListClick);
 // Main generate button
 generateBtn.addEventListener('click', generatePackages);
 
-// *** NEW: Add one listener to the container for all copy clicks ***
-outputContainer.addEventListener('click', handleCopyClick);
+// *** MODIFIED: Add listener to the "Copy All" button ***
+copyAllBtn.addEventListener('click', handleCopyClick);
 
 // Add one of each box by default for usability
 addHotelBox(makkahList);
